@@ -78,13 +78,13 @@ Energy: 2
 
 ## Region test status
 
-Only regions with a real end-to-end run are marked as tested. Code-level support is not presented as equivalent to a browser test.
+The Singapore result is a manual in-browser test. Malaysia and the Philippines are checked by the [live region workflow](https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant/actions/workflows/live-region-tests.yml), which loads the current official regional catalogs and resolves the complete 60-card fixture. An automated catalog-resolution check is not presented as equivalent to a visual browser test.
 
 | Region | URL code | Catalog mode | Last tested | Result |
 | --- | --- | --- | --- | --- |
-| Singapore | `sg` | International English | 4 September 2026 | ✅ 60-card import tested end to end |
-| Malaysia | `my` | International English | — | ⬜ Not tested yet |
-| Philippines | `ph` | International English | — | ⬜ Not tested yet |
+| Singapore | `sg` | International English | 4 September 2026 | ✅ Manual 60-card browser import |
+| Malaysia | `my` | International English | 4 September 2026 | ✅ Automated live 60-card resolution |
+| Philippines | `ph` | International English | 4 September 2026 | ✅ Automated live 60-card resolution |
 | Hong Kong (English) | `hk-en` | International English | — | ⬜ Not tested yet |
 | Hong Kong | `hk` | Localized/native products | — | ⬜ Not tested; experimental |
 | Taiwan | `tw` | Localized/native products | — | ⬜ Not tested; experimental |
@@ -108,7 +108,7 @@ npm test
 npm run check
 ```
 
-The test suite includes the complete 60-card deck used for the first Singapore test and checks localized product-code detection.
+The unit suite includes the complete 60-card deck used for the first Singapore test and checks localized product-code detection. The separate live workflow verifies Malaysia and the Philippines against their current official catalogs. It deliberately stops before the website's **Check Format** endpoint because that separate feature depends on browser-managed editor state.
 
 Contributions are welcome. When adding a set alias, map the Limitless code to the exact product value used by the official English Asia builder and include a test.
 
