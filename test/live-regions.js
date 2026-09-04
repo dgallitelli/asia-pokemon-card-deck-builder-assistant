@@ -119,7 +119,7 @@ async function fetchCatalog(session, productCode) {
     formDeckList: ''
   });
   const catalog = parseCatalog(payload.view || '');
-  assert.ok(catalog.length, `${locale}: no cards returned for ${productCode}`);
+  assert.ok(catalog.length, `${session.base}: no cards returned for ${productCode}`);
   return catalog;
 }
 
