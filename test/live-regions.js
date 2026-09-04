@@ -62,39 +62,71 @@ function parseCatalog(view) {
   return cards;
 }
 
-async function postForm(url, fields, referer) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      accept: 'application/json, text/javascript, */*; q=0.01',
-      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      referer,
-      'user-agent': 'asia-pokemon-card-deck-builder-assistant/1.0 (+GitHub Actions)',
-      'x-requested-with': 'XMLHttpRequest'
-    },
-    body: new URLSearchParams(fields)
-  });
+class HttpSession {
+  constructor(base) {
+    this.base = base;
+    this.cookies = new Map();
+  }
 
-  const text = await response.text();
-  assert.equal(response.ok, true, `${url} returned HTTP ${response.status}: ${text.slice(0, 300)}`);
-  return JSON.parse(text);
+  absorbCookies(headers) {
+    for (const value of headers.getSetCookie()) {
+      const pair = value.split(';', 1)[0];
+      const separator = pair.indexOf('=');
+      if (separator > 0) this.cookies.set(pair.slice(0, separator), pair.slice(separator + 1));
+    }
+  }
+
+  cookieHeader() {
+    return [...this.cookies].map(([name, value]) => `${name}=${value}`).join('; ');
+  }
+
+  async start() {
+    const response = await fetch(this.base, {
+      headers: { 'user-agent': 'asia-pokemon-card-deck-builder-assistant/1.0 (+GitHub Actions)' }
+    });
+    this.absorbCookies(response.headers);
+    assert.equal(response.ok, true, `${this.base} returned HTTP ${response.status}`);
+  }
+
+  async postForm(path, fields) {
+    const url = new URL(path, this.base).href;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json, text/javascript, */*; q=0.01',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        cookie: this.cookieHeader(),
+        referer: this.base,
+        'user-agent': 'asia-pokemon-card-deck-builder-assistant/1.0 (+GitHub Actions)',
+        'x-requested-with': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams(fields)
+    });
+
+    this.absorbCookies(response.headers);
+    const text = await response.text();
+    assert.equal(response.ok, true, `${url} returned HTTP ${response.status}: ${text.slice(0, 300)}`);
+    return JSON.parse(text);
+  }
 }
 
-async function fetchCatalog(locale, productCode) {
-  const base = `https://asia.pokemon-card.com/${locale}/deck-build/`;
-  const payload = await postForm(`${base}search_card/`, {
+async function fetchCatalog(session, productCode) {
+  const payload = await session.postForm('search_card/', {
     freeword: '',
     cardType: 'all',
     formProduct: productCode,
     formProductIds: '',
     formDeckList: ''
-  }, base);
+  });
   const catalog = parseCatalog(payload.view || '');
   assert.ok(catalog.length, `${locale}: no cards returned for ${productCode}`);
   return catalog;
 }
 
 async function testLocale(locale) {
+  const session = new HttpSession(`https://asia.pokemon-card.com/${locale}/deck-build/`);
+  await session.start();
+
   const parsed = parseDeckList(SAMPLE_DECK);
   assert.deepEqual(parsed.errors, []);
   assert.equal(parsed.cards.reduce((sum, card) => sum + card.count, 0), 60);
@@ -102,7 +134,7 @@ async function testLocale(locale) {
   const productCodes = [...new Set(parsed.cards.map((card) => card.productCode))];
   const catalogs = new Map();
   for (const productCode of productCodes) {
-    catalogs.set(productCode, await fetchCatalog(locale, productCode));
+    catalogs.set(productCode, await fetchCatalog(session, productCode));
   }
 
   const warnings = [];
@@ -119,11 +151,10 @@ async function testLocale(locale) {
   }));
   assert.equal(deckData.reduce((sum, card) => sum + Number(card.count), 0), 60);
 
-  const base = `https://asia.pokemon-card.com/${locale}/deck-build/`;
-  const check = await postForm(`${base}check/`, {
+  const check = await session.postForm('check/', {
     formDeckList: JSON.stringify(deckData),
     deckData: JSON.stringify(deckData)
-  }, base);
+  });
 
   const errors = check.errors || check.Errors || [];
   assert.deepEqual(errors, [], `${locale}: format checker returned ${JSON.stringify(errors)}`);
