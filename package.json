@@ -5,7 +5,7 @@
   "description": "Import Limitless/PTCGL deck lists into the Pokémon TCG Asia Deck Construction Tool.",
   "scripts": {
     "check": "node --check limitless-to-trainers.user.js",
-    "test": "node --test"
+    "test": "node --test test/importer.test.js"
   },
   "engines": {
     "node": ">=18"
