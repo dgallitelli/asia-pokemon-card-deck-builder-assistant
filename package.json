@@ -1,0 +1,14 @@
+{
+  "name": "asia-pokemon-card-deck-builder-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Import Limitless/PTCGL deck lists into the Pokémon TCG Asia Deck Construction Tool.",
+  "scripts": {
+    "check": "node --check limitless-to-trainers.user.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
