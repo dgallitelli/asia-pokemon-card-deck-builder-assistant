@@ -1,0 +1,27 @@
+name: Live region tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - limitless-to-trainers.user.js
+      - test/live-regions.js
+      - .github/workflows/live-region-tests.yml
+
+permissions:
+  contents: read
+
+jobs:
+  malaysia-and-philippines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run unit tests
+        run: npm test
+      - name: Test Malaysia and Philippines against the live official catalogs
+        run: node test/live-regions.js my ph
