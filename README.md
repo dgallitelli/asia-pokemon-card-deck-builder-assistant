@@ -88,7 +88,7 @@ The Singapore result is a manual in-browser test. Malaysia and the Philippines a
 | Hong Kong (English) | `hk-en` | International English | — | ⬜ Not tested yet |
 | Hong Kong | `hk` | Localized/native products | — | ⬜ Not tested; experimental |
 | Taiwan | `tw` | Localized/native products | — | ⬜ Not tested; experimental |
-| Thailand | `th` | Localized/native products | — | ⬜ Not tested; experimental |
+| Thailand | `th` | Localized/native products | 4 September 2026 | ❌ English set codes cannot be resolved ([#1](https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant/issues/1)) |
 | Indonesia | `id` | Localized/native products | — | ⬜ Not tested; experimental |
 
 Singapore, Malaysia, the Philippines, and Hong Kong English use the international-English mapping implemented by the script. The localized markets have different products, set composition, card names, and sometimes numbering. The assistant can detect product codes exposed by each regional builder, but it does not translate an English Limitless list into an equivalent localized release. Always review the resolved images before issuing a deck code.
