@@ -23,5 +23,5 @@ jobs:
           node-version: 22
       - name: Run unit tests
         run: npm test
-      - name: Test Malaysia and Philippines against the live official catalogs
+      - name: Resolve 60 cards against the live Malaysia and Philippines catalogs
         run: node test/live-regions.js my ph
