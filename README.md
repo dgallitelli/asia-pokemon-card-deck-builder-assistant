@@ -4,6 +4,13 @@ A dependency-free userscript that adds one-click Limitless/PTCGL deck-list impor
 
 Paste a complete deck list, let the assistant resolve each printing against the official regional catalog, review the card images, and continue with the website's normal format check and deck-code flow. English Limitless/PTCGL imports are supported on the Singapore, Malaysia, Philippines, and Hong Kong English websites.
 
+> [!TIP]
+> **Found this project useful?**
+>
+> - ⭐ [Star the repository](https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant) to help others discover it.
+> - 🐛 Found a problem or have a feature request? [Open an issue](https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant/issues/new).
+> - ☕ Want to support continued development? [Buy me a coffee via PayPal](https://www.paypal.me/DGallit).
+
 ## What it looks like
 
 The userscript adds an importer toolbar above the official deck builder:
