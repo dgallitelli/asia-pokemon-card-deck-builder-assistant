@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Pokémon TCG Asia Deck Builder Assistant
 // @namespace    https://github.com/dgallitelli
-// @version      1.0.0
-// @description  Import Limitless/PTCGL text deck lists into the Pokémon TCG Asia Deck Construction Tool.
+// @version      1.1.0
+// @description  Import English Limitless/PTCGL text deck lists into supported Pokémon TCG Asia deck builders.
 // @author       Davide Gallitelli
 // @license      MIT
 // @homepageURL  https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant
@@ -113,6 +113,16 @@
     return location.pathname.split('/')[1] || 'sg';
   }
 
+  function isSupportedLocale(locale = getLocale()) {
+    return INTERNATIONAL_ENGLISH_LOCALES.has(locale);
+  }
+
+  function unsupportedRegionMessage(locale = getLocale()) {
+    const region = REGION_NAMES[locale] || locale.toUpperCase();
+    return `${region} uses a localized card catalog that cannot reliably resolve English Limitless set codes. ` +
+      'The importer is disabled on this page; the official deck builder remains available.';
+  }
+
   function getNativeProductCodes() {
     if (typeof document === 'undefined') return new Map();
     return new Map(
@@ -165,6 +175,38 @@
       </div>
     </div>
   `;
+  }
+
+  function unsupportedModalHtml() {
+    return `
+    <div id="ltt-overlay" role="dialog" aria-modal="true" aria-labelledby="ltt-title" style="display: block;">
+      <div id="ltt-modal">
+        <h2 id="ltt-title">Limitless importer unavailable</h2>
+        <p><strong>${unsupportedRegionMessage()}</strong></p>
+        <p>English Limitless/PTCGL lists are currently supported on the Singapore, Malaysia, Philippines, and Hong Kong English websites.</p>
+        <p><a href="https://github.com/dgallitelli/asia-pokemon-card-deck-builder-assistant/issues" target="_blank" rel="noopener noreferrer">View compatibility details on GitHub</a></p>
+        <div id="ltt-actions">
+          <button type="button" id="ltt-close" class="ltt-secondary">Continue to deck builder</button>
+        </div>
+      </div>
+    </div>
+  `;
+  }
+
+  function installUnsupportedNotice() {
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+    document.body.insertAdjacentHTML('beforeend', unsupportedModalHtml());
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('ltt-close').addEventListener('click', closeModal);
+    document.getElementById('ltt-overlay').addEventListener('click', (event) => {
+      if (event.target.id === 'ltt-overlay') closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isModalOpen()) closeModal();
+    });
   }
 
   function installUi() {
@@ -591,7 +633,10 @@
   if (testMode) {
     module.exports = {
       SET_CODES,
+      INTERNATIONAL_ENGLISH_LOCALES,
       getLocale,
+      isSupportedLocale,
+      unsupportedRegionMessage,
       getNativeProductCodes,
       resolveProductCode,
       normalizeName,
@@ -603,5 +648,6 @@
     return;
   }
 
-  installUi();
+  if (isSupportedLocale()) installUi();
+  else installUnsupportedNotice();
 })();

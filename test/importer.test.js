@@ -81,6 +81,16 @@ test('uses product codes exposed by a localized regional builder', () => {
   }
 });
 
+test('supports only the international-English regional builders', () => {
+  for (const locale of ['sg', 'my', 'ph', 'hk-en']) {
+    assert.equal(importer.isSupportedLocale(locale), true, `${locale} should be supported`);
+  }
+  for (const locale of ['th', 'id', 'tw', 'hk']) {
+    assert.equal(importer.isSupportedLocale(locale), false, `${locale} should be blocked`);
+    assert.match(importer.unsupportedRegionMessage(locale), /localized card catalog/);
+  }
+});
+
 test('resolves a numbered card and checks its name', () => {
   const catalog = [
     { id: '10', name: 'First Card' },
